@@ -1,7 +1,7 @@
 # spline-examples
 Use of simple polynominal and B-Splines in GNU Octave and Matlab for geometrical shape approximation
 
-The objective are simple spline approximations of common geometric shapes with potential practial use in CNC machining.
+The objective are simple spline approximations of common geometric shapes with potential practical use in CNC machining.
 Interest is on spline interpolations with a low number of parameters, describing common shapes such as circles, ellipses,
 squares, slots, pockets and contours of arbitrary shape.
 
