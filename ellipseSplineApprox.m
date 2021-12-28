@@ -47,9 +47,9 @@
 % https://www.mathworks.com/matlabcentral/answers/86615-how-to-plot-an-ellipse#answer_96122
 % has been used as starting base.
 %
-% Newly introduced was a vector format, error calculation, and most interestingly,
-%    a novel griding methode**
-%    respecting he varying curvature along the circumference of the ellipse.
+% Newly introduced was a vector format, error calculation, and a
+% Method** novel and uncommon, with purpose to get a higher 
+%          node density around regions of high curvature. **
 % ---------------------------------------------------------------------------
 % Definition of mathematicaly perfect ellipse:
 % (x/a)^2+(y/b)^2=1
@@ -149,7 +149,7 @@ optiGrid1=[optiGrid4(1:end-1) optiGrid4(1:end)+optiGrid4(end)-optiGrid4(1)];
 % plot(ttt(1:end-1), diff(optiGrid1),'r')
 
 % Improved griding respecting the variable curvature
-optiEllipse = interp1(p2,highresEllipse,optiGrid1/optiGrid1(end)*p2(end),"linear");
+optiEllipse = interp1(p2,highresEllipse,optiGrid1/optiGrid1(end)*p2(end),"spline");
 % you can test and compare 'linear', 'spline', 'pchip'
 optiTriangle=diff(optiEllipse,1);
 optiD = sqrt(optiTriangle(:,1).^2+optiTriangle(:,2).^2);
@@ -259,7 +259,7 @@ rms=sqrt(sum(err(jdx).^2))/length(tt);
   %   Spline interpolat166ion: 0.012, Max. err: 0.267
   % Result for sampling of optimized sampling according to inverse curvature
   %   Median segment length: 0.382+/-0.244 (by purpose non-equidistant, distance scaling with inverse curvature)
-  %   Spline interpolation: 0.0
+  %   Spline interpolation: 0.012, Max. err: 0.284
   % Result for sampling of equidistant y coordinates
   %   Median segment length: 0.221+/-0.313 (by purpose non-equidistant, distance scaling with inverse curvature)
   %   Spline interpolation: 0.013, Max. err: 0.297

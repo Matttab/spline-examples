@@ -30,6 +30,9 @@
 % Manual padding additional nodes?
 %  Challenge: For which shape to add nodes where exactly ?
 %
+% The code of the published source
+% https://www.mathworks.com/matlabcentral/answers/86615-how-to-plot-an-ellipse#answer_96122
+% has been used as starting base.
 %%
 % Example 1: some odd peak shape to be fit by spline
 % Parts of code are reprint from The MathWorks Inc. help center
@@ -112,7 +115,7 @@ pp3 = csapi(phi3,pts(:,2:6));  %this will fail due to undefined bc
 % this works nice and does not need the bc to be fixed
 % only pts need are the quadrant pts covering [0..2]*pi
 pts3p = [1  0 -1  0  1;  %x
-        0  1  0 -1  0]; %y
+         0  1  0 -1  0]; %y
 pp3p = csape( phi3, pts3p, 'periodic' ); 
 
 % circle

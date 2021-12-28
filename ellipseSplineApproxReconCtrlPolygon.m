@@ -14,7 +14,7 @@
 % serves the purpose of converting a simple pp spline to a B-Spline
 
 % Define an ellipse
-% See splineExamples.m for details
+%    See matttab\spline-examples\splineExamples.m for details
 
 % ---------------------------------------------------------------------------
 % Definition of mathematicaly perfect ellipse:
