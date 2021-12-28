@@ -9,5 +9,6 @@ Mapping of spline parameters to dimensions of the geometrical entities is welcom
 Conversion of parameters between different types of splines is part of adaption to the 
 broad varyity of commercial and home-made hobbist CAD-CAM-CNC systems.
 
-Splines are used in the CAD to define the geometry, in the CAM to define the tool path, and in the
-CNC control system, to interpolate spline to a dedicated set of G-commands.
+Splines are used in the CAD to define the geometry, in the CAM to define the tool path by
+a list of dedicated G-code machine instructions, and in the CNC control SW, to eventually
+interpolate G5 spline instruction to actual workpiece or tool movements.
