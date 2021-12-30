@@ -19,6 +19,23 @@ properties
    _pos_w;
 end %properties
 
+methods (Static=true)
+  function bersteinCoeff=kanonical2bernstein(kanonicalCoeff)
+  M=[1 -3 3 -1;
+     0 3 -6 3;
+     0 0 3 -3;
+     0 0 0  1];
+  bersteinCoeff=((M*(kanonicalCoeff)')');
+end
+  function kanonicalCoeff=bernstein2kanonical(bersteinCoeff)
+  Mi=[3 3 3 3;
+     0 1 2 3;
+     0 0 1 3;
+     0 0 0 3]/3;
+  kanonicalCoeff=((Mi*(bersteinCoeff)')');
+  end
+end %end static methods
+
 methods 
 function [x,y]=SPLINE_FEED2( obj, x1,  y1,  x2,  y2) 
      x0 = obj._pos_x;
@@ -142,7 +159,6 @@ end
 
 end %end methods
 
-methods (Static)
-end %end static methods
+
 
 end %class

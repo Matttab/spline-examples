@@ -38,6 +38,12 @@ P123  = [1.0, 2.0, 3.0,;
          1.0, 1.7, 1.8]; 
 P0123=[[x0; y0] P123];
 
+% scale it to x=[0..1]
+%P123  = [11/3, 2/3, 1;
+%         1.0, 1.7, 1.8]; 
+%P0123=[[x0; y0] P123];
+
+
 % do a spline interpolation separately for x and y
 t=linspace(0,1,length(P0123));
 tt=linspace(0,1,length(P0123)*10+1);
@@ -56,15 +62,15 @@ yy=ppval(pp,xx);
 %         0.05 -0.52 1.44 0.58]
 
 % matlab comparison
-% pp= spline(P0123(1,:), P0123(2,:));
+% qq= spline(P0123(1,:), P0123(2,:));
 % also with breaks = [0 1 2 3 4];
 % will give other coefficients than octave splinefit
-% pp =  [-0.05  0.00 1.05 0.0; % first segment is almost linear
-%        -0.05 -0.15 0.90 1.0;
-%        -0.05 -0.30 0.45 1.7]
+qq.coefs =  [-0.05  0.00 1.05 0.0; % first segment is almost linear
+        -0.05 -0.15 0.90 1.0;
+        -0.05 -0.30 0.45 1.7];
 
 % Conversion to B-Spline using Matlab
-% bpp = fn2fm(pp, 'B-', 0.1)
+% bpp = fn2fm(qq, 'B-', 0.1)
 % will change the breaks to knots with 4-fold multiplicity at start and end pt
 % bpp.knots = [0 0 0 0 3 3 3 3]
 bpp.coefs = [0 1.05 2.1 1.8] ; %the corners of the control polygon y-coordinates
@@ -106,6 +112,12 @@ legend({'nodes',  ...
 'cubic octave fit explicit y=y(x)', ...
 'Coefs=control polygon from matlab conversion to B-Spline', 'spline constructor (output of 3 splines)',}, 'location','southeast'  );
 
+% conversion works only on
+% parameterspace t=[0..1]
+% transformation x=x(t)
+% to be implemented
+linuxCNC.kanonical2bernstein(qq.coefs)
+linuxCNC.bernstein2kanonical(ctrlPt)
 
 
 
