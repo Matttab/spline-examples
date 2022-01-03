@@ -110,10 +110,17 @@ end
 % C=[ 1 2 3 4; 1 1.4 1.5 1.55]'
 % pts= construct_spline(C)
 function [x, y]=construct_spline(obj,input)
-   C=input';
-    %4 coeffs. for cubic spline a=t0,b=t1,c=t2,d=t3
-    n = size(C,1)-1; % number of splines
-    S=zeros(n,2,4);   % 2dim = x,y, 
+   C=input'; % [x;y] values of spline with N-nodes as N columns
+   % append straight move points prior and after spline to define start tangent
+   % and end tangents to connect smooth to straight segment at the ends.
+   % 4 coeffs. for cubic spline a=t0,b=t1,c=t2,d=t3
+   % the code probably does some efficient cascade algorithm to 
+   % reconstruct spline as convex sum of Bezier polynomials
+   % each points in input will be hit because
+   % N-Segments are generated, and for each segment, start and end points
+   % are always coincident with the spline itself
+    n = size(C,1)-1; % number of spline segments
+    S=zeros(n,2,4);   % 2nd dim = x or y, 3rd dim power series, t^3,t^2,t,1
     for dim=1:2  %x,y loop
         % define d:
           d(1)=3.0*(C(2,dim)-C(1,dim));
@@ -138,8 +145,8 @@ function [x, y]=construct_spline(obj,input)
          end
         % calculate spline S(i)(dim) a, b, c and d:
         for i=1:n
-            S(i,dim,1)=C(i,dim);
-            S(i,dim,2)=x(i);
+            S(i,dim,1)=C(i,dim); %knots/nodes
+            S(i,dim,2)=x(i);     %the x(i) are actually y values
             S(i,dim,3)=3.0*(C(i+1,dim) -C(i,dim)) - 2.0*x(i) - x(i+1);
             S(i,dim,4)=2.0*(C(i,dim)   -C(i+1,dim)) + x(i) + x(i+1);
         end
@@ -157,7 +164,44 @@ function [x, y]=construct_spline(obj,input)
         end
 
 end
-    
+
+function S=construct_spline_coefs(obj,input)
+   C=input';
+    %4 kanonical coeffs. for cubic spline a=t0,b=t1,c=t2,d=t3
+    n = size(C,1)-1; % number of splines
+    S=zeros(n,2,4);   % 2dim = x,y, 
+    for dim=1:2  %x,y loop
+        % define d:
+          d(1)=3.0*(C(2,dim)-C(1,dim));
+        for i=2:n
+          d(i)=3.0*(C(i+1,dim)-C(i-1,dim));
+        end
+          d(n+1)=3.0*(C(n+1,dim)-C(n,dim));
+          %  forward sweep: simplified tridiagonal solution:
+          % ball a(i)=1 and all c(i)=1
+        
+            b(1)=2.0;
+        for i=2:n+1
+            w = 1.0/b(i-1);
+            b(i) = 4.0 - w;
+            d(i) -= (w*d(i-1));
+        end
+        % calculate solution vector x(i) = D(i):
+        % (Wikipedia x() = Wolfram D())
+        x(n+1)=d(n+1)/b(n+1);
+        for i=n:-1:1
+            x(i)=(d(i)-x(i+1))/b(i);
+         end
+        % calculate spline S(i)(dim) a, b, c and d kanocial coefs
+        for i=1:n
+            S(i,dim,1)=C(i,dim);
+            S(i,dim,2)=x(i);
+            S(i,dim,3)=3.0*(C(i+1,dim) -C(i,dim)) - 2.0*x(i) - x(i+1);
+            S(i,dim,4)=2.0*(C(i,dim)   -C(i+1,dim)) + x(i) + x(i+1);
+        end
+    end
+
+end    
 
 % template for NURBS_FEED
 % Code not functional

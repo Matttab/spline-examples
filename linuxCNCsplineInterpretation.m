@@ -92,9 +92,13 @@ db=diff(yb)./diff(xb);
 % For a set of G5 codes
 % Several splines in a row  
 % This constructs a convex superposition
-% but does not respect the boundary conditions!     
-[x4, y4]= mySpline.construct_spline(P0123);
-
+% but does not respect the boundary conditions!   
+% append straight move points prior and after spline to define start tangent
+% and end tangents to connect smooth to straight segment at the ends.
+ 
+[x4, y4]= mySpline.construct_spline([[-1; -1] P0123 [4;1.5]]);
+coefs= mySpline.construct_spline_coefs([[-1; -1] P0123 [4;1.5]]);
+coefs(:,:,1)
 % We acwant only one spline segment between start and endpt
 [x, y]= mySpline.construct_spline([P0123(:,1) P0123(:,4)]);
   
@@ -113,7 +117,7 @@ ctrl2Pt(:,3)=P0123(:,4);
 
 figure; hold on;
 plot(P0123(1,:), P0123(2,:),'+');
-
+axis([0 3 0 2.5])
 plot(xq,yq,'--r');
 %plot(x,y,':k');
 %plot(xb,yb,'-b');
@@ -124,7 +128,7 @@ plot(xc,yc,'--b');
 plot(P0123(1,:),bpp.coefs ,'-db');
 
 for k=1:3
- plot(x4(k,:),y4(k,:),'--k');
+ plot(x4(k,:),y4(k,:),':k');
 end
 legend({'nodes',  ...
 "SPLINE FEED2(y\'(0)=1.05,y\'(1)=-0.3  )", ...
