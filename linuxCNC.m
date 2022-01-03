@@ -21,25 +21,31 @@ end %properties
 
 methods (Static=true)
   function bersteinCoeff=kanonical2bernstein(kanonicalCoeff)
-  M=[1 -3 3 -1;
-     0 3 -6 3;
-     0 0 3 -3;
-     0 0 0  1];
-  bersteinCoeff=((M*(kanonicalCoeff)')');
-end
+  M=[1 -3 3 -1; %1-3t+3t^2- t^3
+     0 3 -6 3;  %  3t-6t^2+3t^3
+     0 0 3 -3;  %     3t^2-3t^3
+     0 0 0  1]; %          3t^3
+  bersteinCoeff=((M*kanonicalCoeff')');
+  end
   function kanonicalCoeff=bernstein2kanonical(bersteinCoeff)
   Mi=[3 3 3 3;
-     0 1 2 3;
-     0 0 1 3;
-     0 0 0 3]/3;
-  kanonicalCoeff=((Mi*(bersteinCoeff)')');
+      0 1 2 3;
+      0 0 1 3;
+      0 0 0 3]/3;
+  kanonicalCoeff=((Mi*bersteinCoeff')');
   end
 end %end static methods
 
 methods 
+  
+% [x,y]=SPLINE_FEED2( obj, x1,  y1,  x2,  y2) 
+% End point = [x2,y2]
+% Start point = [obj._pos_x,obj._pos_y]
+% Tanget slope is (y1-y0)/(x1-x0) at start
+% Tanget slope is (y2-y1)/(x2-x1) at end
 function [x,y]=SPLINE_FEED2( obj, x1,  y1,  x2,  y2) 
-     x0 = obj._pos_x;
-     y0 = obj._pos_y;
+     x0 = obj._pos_x; %start point
+     y0 = obj._pos_y; %start point
     % Tanget slope is (y1-y0)/(x1-x0) at start
     % Tanget slope is (y2-y1)/(x2-x1) at end
     fprintf(stderr, "SPLINE_FEED(quadratic): %8.4f %8.4f %8.4f %8.4f %8.4f %8.4f\n",
@@ -48,16 +54,24 @@ function [x,y]=SPLINE_FEED2( obj, x1,  y1,  x2,  y2)
     for i=0:100 % do 100 straight line per segment  
        t = i / 100.;
        % quadratic Bezier base
-       t2 = t*t;
-       t1 = 2*t*(1-t);
-       t0 = (1-t)*(1-t);
-       x(i+1,1) = x0*t0 + x1*t1 + x2*t2;
-       y(i+1,1) = y0*t0 + y1*t1 + y2*t2;
+       % Bk2 = (2 k)t^k*(1-t)^(2-k)
+       B22 = t*t;        % dB22/dt=2*t=         [0   2]     for t=[0 1]
+       B12 = 2*t*(1-t);  % dB12/dt=2(1-2*t)=    [2  -2]  for t=[0 1]
+       B02 = (1-t)*(1-t);% dB02/dt=-2*(1-t)=    [-2 -0]  for t=[0 1]
+       x(i+1,1) = x0*B02 + x1*B12 + x2*B22;%= 2*[(x1-x0) (x2-x1)]
+       y(i+1,1) = y0*B02 + y1*B12 + y2*B22;%= 2*[(y1-y0) (y2-y1)]
+       %dx/dy=(dx/dt)/(dy/dy)=(y1-y0)/(x1-x0) at t=0
+       %dx/dy=(dx/dt)/(dy/dy)=(y2-y1)/(x2-x1) at t=1
       % EBo -- replace 12345 with *whatever* gives us the line_number
       % STRAIGHT_FEED(12345, x,y, _pos_z, _pos_a, _pos_b, _pos_c, _pos_u, _pos_v, _pos_w);
     end
 end
 
+% [x,y]=SPLINE_FEED2( obj, x1,  y1,  x2,  y2, x3, y3) 
+% End point = [x3,y3]
+% Start point = [obj._pos_x,obj._pos_y]
+% Tanget slope is (y1-y0)/(x1-x0) at start
+% Tanget slope is (y3-y2)/(x3-x2) at end
 function [x,y]=SPLINE_FEED3( obj, x1,  y1,  x2,  y2,  x3,  y3) 
      x0 = obj._pos_x;
      y0 = obj._pos_y;
@@ -71,13 +85,23 @@ function [x,y]=SPLINE_FEED3( obj, x1,  y1,  x2,  y2,  x3,  y3)
       % bi,n = (n k)*t^i*(1-t)^(n-i)
       % start point interpolation property: start at t1(0)=1
       % end   point interpolation property: end   at t3(0)=1
+      % Bk3 = (3 k)t^k*(1-t)^(3-k)
        t = i / 100;
-       t3 = t*t*t;            % t3(0)=0[3x] and                 t3(1)=1[3] start point
-       t2 = 3*t*t*(1-t);      % t3(0)=0[2x] and t3(1)=0[1x]                             t2(1/2)=3/8
-       t1 = 3*t*(1-t)*(1-t);  % t3(0)=0[1x] and t3(1)=0[2x]                             t2(1/2)=3/8
-       t0 = (1-t)*(1-t)*(1-t);%             and t3(1)=0[3x] and t3(0)=1[3] endpoint     t2(1/2)=3/8
-       x(i+1,1) = x0*t0 + x1*t1 + x2*t2 + x3*t3;
-       y(i+1,1) = y0*t0 + y1*t1 + y2*t2 + y3*t3;
+       B33 = t*t*t;            % t3(0)=0[3x] and                 t3(1)=1[3] start point
+       B23 = 3*t*t*(1-t);      % t3(0)=0[2x] and t3(1)=0[1x]                             t2(1/2)=3/8
+       B13 = 3*t*(1-t)*(1-t);  % t3(0)=0[1x] and t3(1)=0[2x]                             t2(1/2)=3/8
+       B03 = (1-t)*(1-t)*(1-t);%             and t3(1)=0[3x] and t3(0)=1[3] endpoint     t2(1/2)=3/8
+       x(i+1,1) = x0*B03 + x1*B13 + x2*B23 + x3*B33;
+       y(i+1,1) = y0*B03 + y1*B13 + y2*B23 + y3*B33;
+       
+       %B33/dt=3*t^2 =        [0    3]     for t=[0 1] B33'= 3*[B22]=3*t^2 
+       %B13/dt=3t*(2-3*t)=    [0   -3]     for t=[0 1] B13'= 3*[B02-B12]=3t*(2-3*t)
+       %B23/dt=3*(1-3t)(1-t)= [3    0]     for t=[0 1] B23'= 3*[B12-B22]=3*(1-t)(1-3*t)
+       %B03/dt=-3(1-t)^2=     [-3   0]     for t=[0 1] B03'= 3*[-B02]=-3(1-t)^2
+       %dx/dy=(dx/dt)/(dy/dy)=(y1-y0)/(x1-x0) at t=0
+       %dx/dy=(dx/dt)/(dy/dy)=(y3-y2)/(x3-x2) at t=1
+       
+       
       % EBo -- replace 12345 with *whatever* gives us the line_number
       % STRAIGHT_FEED(12345, x,y, _pos_z, _pos_a, _pos_b, _pos_c, _pos_u, _pos_v, _pos_w);
     end
