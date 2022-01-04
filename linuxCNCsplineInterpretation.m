@@ -95,13 +95,20 @@ db=diff(yb)./diff(xb);
 % but does not respect the boundary conditions!   
 % append straight move points prior and after spline to define start tangent
 % and end tangents to connect smooth to straight segment at the ends.
- 
+
+% We do not want 4 spline segment between start and endpt 
 [x4, y4]= mySpline.construct_spline([[-1; -1] P0123 [4;1.5]]);
 coefs= mySpline.construct_spline_coefs([[-1; -1] P0123 [4;1.5]]);
 coefs(:,:,1)
+
 % We acwant only one spline segment between start and endpt
-[x, y]= mySpline.construct_spline([P0123(:,1) P0123(:,4)]);
-  
+% but how to fix bc?
+% This will not do it:
+[x, y]= mySpline.construct_spline([[-1:0.2:-0.2; -1:0.2:-0.2] P0123(:,[1,end]) [3.2:0.2:4;1.74:-0.06:1.5]]);
+ddd=diff(y(2,:))./diff(x(2,:));
+% use the middle segment defined on x=[0 3]
+% ddd(1)  = 0.73 %wrong slope
+% ddd(end)  = 0.73%wrong slope
          
 ctrl3Pt(:,1)=P0123(:,1);       
 ctrl3Pt(:,2)=[1; 1.05];   
@@ -119,7 +126,7 @@ figure; hold on;
 plot(P0123(1,:), P0123(2,:),'+');
 axis([0 3 0 2.5])
 plot(xq,yq,'--r');
-%plot(x,y,':k');
+
 %plot(xb,yb,'-b');
 
 plot(xx,yy,'-m');
@@ -127,6 +134,10 @@ plot(xc,yc,'--b');
 %plot(xxp,yyp,'-r');
 plot(P0123(1,:),bpp.coefs ,'-db');
 
+% plot the middle segment on x=[0 3]
+% first and last segments required as lead
+% to fix bc
+% plot(x(6,:),y(6,:),':k');
 for k=1:3
  plot(x4(k,:),y4(k,:),':k');
 end
@@ -140,7 +151,6 @@ legend({'nodes',  ...
 % parameterspace t=[0..1]
 linuxCNC.kanonical2bernstein(pp.coefs)
 linuxCNC.bernstein2kanonical([3.1 -6.3 3.15 0])
-
 
 
 

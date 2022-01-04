@@ -119,8 +119,20 @@ function [x, y]=construct_spline(obj,input)
    % each points in input will be hit because
    % N-Segments are generated, and for each segment, start and end points
    % are always coincident with the spline itself
+   
+   %Example C=[-1 0 1 2 3 4; -1 0 1 1.7 1.8 1.5]';
+   % d=3.0000   4.5000   3.81429   1.37308  -0.96804  -0.64061
+   % b=2.0000   3.5000   3.7143    3.7308    3.7320    3.7320
+   % w=0.26796  0.5000   0.28571   0.26923   0.26804   0.26796
+   %
+   % S(1,:,:)=a0 = [-1 0 1 2 3; -1 0 1 1.7 1.8] %knots/nodes
+   % S(2,:,:)=a1
+   % S(3,:,:)=a2
+   % S(4,:,:)=a3
+   
     n = size(C,1)-1; % number of spline segments
-    S=zeros(n,2,4);   % 2nd dim = x or y, 3rd dim power series, t^3,t^2,t,1
+    S=zeros(n,2,4);   % 2nd dim = x or y, 3rd dim
+    % power series, a3*t^3 +a2*t^2+a1*t +a0
     for dim=1:2  %x,y loop
         % define d:
           d(1)=3.0*(C(2,dim)-C(1,dim));
@@ -133,9 +145,9 @@ function [x, y]=construct_spline(obj,input)
         
             b(1)=2.0;
         for i=2:n+1
-            w = 1.0/b(i-1);
-            b(i) = 4.0 - w;
-            d(i) -= (w*d(i-1));
+            w(i) = 1.0/b(i-1);
+            b(i) = 4.0 - w(i);
+            d(i) -= (w(i)*d(i-1));
         end
         % calculate solution vector x(i) = D(i):
         % (Wikipedia x() = Wolfram D())
