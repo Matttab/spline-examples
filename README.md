@@ -13,8 +13,12 @@ Mapping of spline parameters to dimensions of the geometrical entities is welcom
 Conversion of parameters between different types of splines is part of adaption to the 
 broad varyity of commercial and home-made hobbist CAD-CAM-CNC systems.
 
-Folder content:
-\                               Class and exampleCode to test spline routines of linuxCNC 
-\linuxCNCsplineTest\            linuxCNC compatible G5-Codes for Circles and Ellipses made of splines 
-\shapeApproximation\            Exapmles to approximate Circles and Ellipses with splines 
-\controlPolygonReconstruction\  Octave and Matlab examples code on splines in general
+Folder contents
+
+\Class and example code to test spline routines of linuxCNC 
+
+\linuxCNCsplineTest\linuxCNC compatible G5-Codes for Circles and Ellipses made of splines 
+
+\shapeApproximation\Exapmles to approximate Circles and Ellipses with splines 
+
+\controlPolygonReconstruction\Octave and Matlab examples code on splines in general
